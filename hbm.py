@@ -1,5 +1,5 @@
 from flask import Flask
-import json
+import http
 import click
 import time
 import requests
@@ -51,7 +51,7 @@ def create_app(host, port, period, url):
         global prev_heartbeat
         prev_heartbeat = time.time()
         log.info('Heartbeat received.')
-        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return '', http.HTTPStatus.OK
 
     app.run(host=host, port=port)
 

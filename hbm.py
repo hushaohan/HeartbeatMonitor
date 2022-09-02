@@ -24,9 +24,12 @@ def check_heartbeat():
         prev_heartbeat = time.time()
     else:
         prev_heartbeat_age = time.time() - prev_heartbeat
-        log.info(f'Last heartbeat received {prev_heartbeat_age:9.2f} seconds ago.')
-        if prev_heartbeat_age >= heartbeat_period:
+        log.info(f'Last heartbeat received {prev_heartbeat_age:.2f} seconds ago.')
+        if prev_heartbeat_age >= 2 * heartbeat_period:
+            log.info('dead')
             requests.get(action_url)
+        else:
+            log.info('alive')
 
 
 @click.command()

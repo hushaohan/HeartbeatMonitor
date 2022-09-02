@@ -4,6 +4,12 @@ import click
 import time
 import requests
 import threading
+import logging
+from systemd.journal import JournalHandler
+
+log = logging.getLogger('demo')
+log.addHandler(JournalHandler())
+log.setLevel(logging.INFO)
 
 heartbeat_period: float = None
 prev_heartbeat: float = None
@@ -14,9 +20,11 @@ def check_heartbeat():
     global prev_heartbeat
     threading.Timer(heartbeat_period, check_heartbeat).start()
     if prev_heartbeat is None:
+        log.info('Starting listening for heartbeats.')
         prev_heartbeat = time.time()
     else:
         prev_heartbeat_age = time.time() - prev_heartbeat
+        log.info(f'Last heartbeat received {prev_heartbeat_age:9.2f} seconds ago.')
         if prev_heartbeat_age >= heartbeat_period:
             requests.get(action_url)
 
@@ -39,6 +47,7 @@ def create_app(host, port, period, url):
     def run():
         global prev_heartbeat
         prev_heartbeat = time.time()
+        log.info('Heartbeat received.')
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
     app.run(host=host, port=port)

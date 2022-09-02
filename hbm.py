@@ -13,10 +13,9 @@ prev_heartbeat = time.time()
 def check_heartbeat():
     global prev_heartbeat
     threading.Timer(heartbeat_period, check_heartbeat).start()
-    gap = time.time() - prev_heartbeat
-    print(heartbeat_period, action_url)
-    if gap >= heartbeat_period:
-        print(f"dead: {gap}")
+    prev_heartbeat_age = time.time() - prev_heartbeat
+    print(f'Previous heartbeat was received {prev_heartbeat_age} seconds ago.')
+    if prev_heartbeat_age >= heartbeat_period:
         requests.get(action_url)
 
 

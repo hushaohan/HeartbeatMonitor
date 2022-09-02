@@ -39,6 +39,8 @@ def create_app(host, port, period, url):
     @click.argument("url")
     @click.argument("period")
     def run():
+        global prev_heartbeat
+        prev_heartbeat = time.time()
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
     app.run(host=host, port=port)

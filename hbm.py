@@ -20,7 +20,10 @@ def check_heartbeat():
         prev_heartbeat_age = time.time() - prev_heartbeat
         print(f'Previous heartbeat was received {prev_heartbeat_age} seconds ago.')
         if prev_heartbeat_age >= heartbeat_period:
+            print('dead')
             requests.get(action_url)
+        else:
+            print('alive')
 
 
 @click.command()
@@ -41,6 +44,7 @@ def create_app(host, port, period, url):
     def run():
         global prev_heartbeat
         prev_heartbeat = time.time()
+        print('Heartbeat received')
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
     app.run(host=host, port=port)

@@ -5,18 +5,22 @@ import time
 import requests
 import threading
 
-heartbeat_period: float
-action_url: str
-prev_heartbeat = time.time()
+heartbeat_period: float = None
+prev_heartbeat: float = None
+action_url: str = None
 
 
 def check_heartbeat():
     global prev_heartbeat
     threading.Timer(heartbeat_period, check_heartbeat).start()
-    prev_heartbeat_age = time.time() - prev_heartbeat
-    print(f'Previous heartbeat was received {prev_heartbeat_age} seconds ago.')
-    if prev_heartbeat_age >= heartbeat_period:
-        requests.get(action_url)
+    if prev_heartbeat is None:
+        prev_heartbeat = time.time()
+        print(f'Starting up to monitor heartbeats.')
+    else:
+        prev_heartbeat_age = time.time() - prev_heartbeat
+        print(f'Previous heartbeat was received {prev_heartbeat_age} seconds ago.')
+        if prev_heartbeat_age >= heartbeat_period:
+            requests.get(action_url)
 
 
 @click.command()
@@ -35,8 +39,6 @@ def create_app(host, port, period, url):
     @click.argument("url")
     @click.argument("period")
     def run():
-        global prev_heartbeat
-        prev_heartbeat = time.time()
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
     app.run(host=host, port=port)
